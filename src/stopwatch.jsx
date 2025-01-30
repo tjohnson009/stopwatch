@@ -72,6 +72,10 @@ function lapTime() {
     const button = 0; 
 }
 
+function addLap() {
+    
+}
+
 function resetStopwatch() {
     setTimeIsRolling(false); 
     resetTime(); 
