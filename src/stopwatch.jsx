@@ -14,12 +14,13 @@ useEffect(() => {
     let [milliseconds, seconds, minutes, hours] = time; 
     let newMilliseconds = 0; 
     let newSeconds = 0, newMinutes = 0, newHours = 0; 
+    const intervalAmount = 19; 
 
     if (timeIsRolling) {
         let timeID = setInterval(() => {
             // console.log(milliseconds); 
             // setTime([milliseconds += 19, seconds, minutes, hours]); 
-            newMilliseconds = milliseconds + 19;
+            newMilliseconds = milliseconds + intervalAmount;
             newSeconds = seconds;
             newMinutes = minutes;
             newHours = hours;
@@ -27,7 +28,7 @@ useEffect(() => {
                 // // setTime([milliseconds - 1000, seconds, minutes, hours]);
                 // setTime(...time, milliseconds = milliseconds - 1000, seconds = seconds + 1);  
                 newSeconds = seconds + 1;  
-                newMilliseconds -= 1000; // 1000ms in one second, excess should carry over to the next s tate update
+                newMilliseconds -= 1000; // 1000ms in one second, excess should carry over to the next state update
             } 
             if (newSeconds > 59) {
                 // setTime(...time, seconds = 0, minutes = minutes + 1);   
@@ -48,15 +49,21 @@ useEffect(() => {
             // displayRef.current.innerHTML = `${hours}:${minutes}:${seconds}:${milliseconds}`; 
             // displayRef.current.innerHTML = `${newHours}:${newMinutes}:${newSeconds}:${newMilliseconds}`; 
             // updateDisplay(); 
-        }, 19); 
+        }, intervalAmount); 
         intervalRef.current = timeID; 
         // console.log (timeID); 
     }
 
-    return () => {
+    return () => { // cleanup
         clearInterval(intervalRef.current); 
     }
 }); 
+
+useEffect(() => {
+    if (laps.length > 0) {
+        console.log(`Updated laps: ${laps}`); 
+    }
+}, [laps]); 
 
 function stopOrStartStopWatch() {
     // isTimeRolling ? setIsTimeRolling(false) : setIsTimeRolling(true);  
@@ -69,16 +76,35 @@ function stopOrStartStopWatch() {
 }
 
 function lapTime() {
-    const button = 0; 
+    // let lapTime = [0, 0, 0, 0]; 
+    // setLaps(laps => [...laps].push([time]));
+    if (time != [0,0,0,0]) {
+        setLaps([...laps, [time]]);
+    }
+    // console.log(laps); 
 }
 
-function addLap() {
+function addLapToDisplay() {
+        // laps.forEach(lap => {
+        //     //add it to the dom
+        //     console.log(lap); 
+        // })
     
+}
+
+function lapCycle() {
+        lapTime(); 
+        addLapToDisplay(); 
+}
+
+function clearLapsFromDisplay() {
+
 }
 
 function resetStopwatch() {
     setTimeIsRolling(false); 
     resetTime(); 
+    clearLapsFromDisplay(); 
 }
 
 function resetTime() {
@@ -104,7 +130,7 @@ return (
 <div className='buttons flex gap-10'>
   <button className='min-w-min' id='startstop' onClick={stopOrStartStopWatch}>{ timeIsRolling ? 'Stop' : 'Start' }</button>
   <button className='min-w-min' id='reset' onClick={resetStopwatch}>Reset</button>
-  <button className='min-w-min' id='lap'>Lap</button>
+  <button className='min-w-min' id='lap' onClick={lapCycle}>Lap</button>
 </div>
 <div className='lap-times'>
 
