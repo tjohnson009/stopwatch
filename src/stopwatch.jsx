@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react'; 
+import Lap from './Lap';
+import formatTime from './formatTime';
 
 function Stopwatch() {
 // const [timeElapsed, setTimeElasped] = useState(0); 
@@ -6,7 +8,7 @@ const [timeIsRolling, setTimeIsRolling] = useState(false);
 // const [time, setTime] = useState({ hours: 0, minutes: 0, seconds: 0, milliseconds: 0 }); 
 const [time, setTime] = useState([0, 0, 0, 0]); // milliseconds, seconds, minutes, hours
 // const [time, setTime] = useState({milliseconds: 0, seconds:0, minutes:0, hours: 0}); // milliseconds, seconds, minutes, hours
-const [laps, setLaps] = useState([]); 
+const [laps, setLaps] = useState([]); // Array[]
 const intervalRef = useRef(null); 
 // const displayRef = useRef(null); 
 
@@ -60,8 +62,9 @@ useEffect(() => {
 }); 
 
 useEffect(() => {
-    if (laps.length > 0) {
-        console.log(`Updated laps: ${laps}`); 
+    console.log(laps.length, laps); 
+    if (laps.length > 0 && timeIsRolling) {
+        console.log(`Updated lap counts: ${laps}`); 
     }
 }, [laps]); 
 
@@ -78,23 +81,29 @@ function stopOrStartStopWatch() {
 function lapTime() {
     // let lapTime = [0, 0, 0, 0]; 
     // setLaps(laps => [...laps].push([time]));
-    if (time != [0,0,0,0]) {
+    // console.log(time); 
+    // if (time[0] !== 0 || time[1] !== 0 || time[2] !== 0 || time[2] !== 0) {
+    if (time.some(el => el !== 0)) {
         setLaps([...laps, [time]]);
+    } else {
+        console.log('No time yet.'); 
     }
     // console.log(laps); 
 }
 
 function addLapToDisplay() {
-        // laps.forEach(lap => {
-        //     //add it to the dom
-        //     console.log(lap); 
-        // })
+    // let lapDiv = document.querySelector('.lap-times');
+    //     laps.forEach(lap => {
+    //         let lapToInsert = Lap(formatTime(lap)); 
+    //         lapDiv.appendChild(lapToInsert); 
+    //         console.log(lap); 
+    //     })
     
 }
 
 function lapCycle() {
         lapTime(); 
-        addLapToDisplay(); 
+        // addLapToDisplay(); 
 }
 
 function clearLapsFromDisplay() {
@@ -104,6 +113,7 @@ function clearLapsFromDisplay() {
 function resetStopwatch() {
     setTimeIsRolling(false); 
     resetTime(); 
+    resetLaps(); 
     clearLapsFromDisplay(); 
 }
 
@@ -112,10 +122,14 @@ function resetTime() {
  // reset display and interval?
 }
 
-function formatTime([ms, s, m, h]) {
-    const pad = (num, size) => String(num).padStart(size, '0');
-    return `${pad(h, 2)}:${pad(m, 2)}:${pad(s, 2)}:${pad(ms, 3)}`;
-  }
+function resetLaps() {
+    setLaps([]); 
+}
+
+// function formatTime([ms, s, m, h]) {
+//     const pad = (num, size) => String(num).padStart(size, '0');
+//     return `${pad(h, 2)}:${pad(m, 2)}:${pad(s, 2)}:${pad(ms, 3)}`;
+//   }
 
 // function updateDisplay() {
 //     let display = document.querySelector('.display'); 
@@ -133,7 +147,9 @@ return (
   <button className='min-w-min' id='lap' onClick={lapCycle}>Lap</button>
 </div>
 <div className='lap-times'>
-
+{laps.map((lap, index) => (
+            <Lap key={index} lapNumber={index + 1} lapTime={lap} />
+          ))}
 </div>
 </div>
 </>
